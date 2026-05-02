@@ -16,13 +16,8 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
   // Ensure transactions is always an array
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
 
-  // Robust month filtering that avoids timezone shifts
-  const monthTransactions = safeTransactions.filter(t => {
-    if (!t.date) return false;
-    const tDate = new Date(t.date);
-    const now = new Date();
-    return tDate.getUTCFullYear() === now.getFullYear() && (tDate.getUTCMonth()) === now.getMonth();
-  });
+  const currentMonthStr = format(new Date(), 'yyyy-MM');
+  const monthTransactions = safeTransactions.filter(t => t.date && t.date.substring(0, 7) === currentMonthStr);
   
   const salaryReceived = monthTransactions
     .filter(t => t.type?.toLowerCase().includes('salary') || t.category?.toLowerCase().includes('salary'))
@@ -33,11 +28,23 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const transferredToMaa = monthTransactions
-    .filter(t => t.type?.toLowerCase() === 'transfer' && t.destinationAccount?.name?.toLowerCase().includes('maa'))
+    .filter(t => 
+      (t.type?.toLowerCase() === 'transfer' || t.type?.toLowerCase() === 'expense') && 
+      (t.destinationAccount?.name?.toLowerCase().includes('maa') || t.category?.toLowerCase().includes('maa'))
+    )
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const handExpenses = monthTransactions
-    .filter(t => t.type?.toLowerCase().includes('expense') || t.category?.toLowerCase().includes('expense'))
+    .filter(t => {
+      const type = t.type?.toLowerCase();
+      const isMaa = t.destinationAccount?.name?.toLowerCase().includes('maa') || t.category?.toLowerCase().includes('maa');
+      // Hand expenses are all outgoing transactions that are NOT salary, NOT EMI, NOT self-transfer, and NOT to Maa
+      return (type === 'expense') && 
+             type !== 'salary' && 
+             type !== 'emi' && 
+             type !== 'self_transfer' && 
+             !isMaa;
+    })
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
   const maaSavingsTotal = accounts.find(a => a.name.toLowerCase().includes('maa'))?.balance || 0;
