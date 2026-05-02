@@ -34,8 +34,8 @@ class TransactionService {
         amount,
         type,
         category,
-        source_account_id,
-        destination_account_id,
+        source_account_id: source_account_id ? Number(source_account_id) : null,
+        destination_account_id: destination_account_id ? Number(destination_account_id) : null,
         note,
         date: date ? new Date(date) : new Date()
       });
@@ -69,8 +69,8 @@ class TransactionService {
       old.amount = amount;
       old.type = type;
       old.category = category;
-      old.source_account_id = source_account_id;
-      old.destination_account_id = destination_account_id;
+      old.source_account_id = source_account_id ? Number(source_account_id) : null;
+      old.destination_account_id = destination_account_id ? Number(destination_account_id) : null;
       old.note = note;
       old.date = date ? new Date(date) : old.date;
 

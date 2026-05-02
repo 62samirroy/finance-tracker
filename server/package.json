@@ -7,7 +7,8 @@
     "prestart": "npm run build",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "seed": "ts-node src/seed.ts"
+    "seed": "ts-node src/seed.ts",
+    "cleanup": "ts-node src/cleanup.ts"
   },
   "keywords": [],
   "author": "",
