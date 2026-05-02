@@ -5,6 +5,7 @@ import { AppDataSource } from "./data-source";
 import accountRoutes from "./routes/accountRoutes";
 import transactionRoutes from "./routes/transactionRoutes";
 import budgetRoutes from "./routes/budgetRoutes";
+import { Account } from "./entities/Account";
 
 dotenv.config();
 
@@ -42,11 +43,33 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
+async function seedInitialData() {
+  const accountRepository = AppDataSource.getRepository(Account);
+  const count = await accountRepository.count();
+  if (count === 0) {
+    console.log("🌱 No accounts found. Seeding initial data...");
+    const initialAccounts = [
+      { name: 'Punjab Bank', balance: 0 },
+      { name: 'SBI Bank', balance: 0 },
+      { name: 'Jio Payments', balance: 0 },
+      { name: 'Maa Savings', balance: 0 }
+    ];
+    for (const acc of initialAccounts) {
+      const newAccount = accountRepository.create(acc);
+      await accountRepository.save(newAccount);
+    }
+    console.log("✨ Seeding completed!");
+  } else {
+    console.log(`📊 Database already has ${count} accounts.`);
+  }
+}
+
 const PORT = process.env.PORT || 5000;
 
 AppDataSource.initialize()
-    .then(() => {
+    .then(async () => {
         console.log("Data Source has been initialized!");
+        await seedInitialData();
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
         });

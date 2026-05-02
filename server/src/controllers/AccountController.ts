@@ -4,6 +4,7 @@ import accountService from "../services/AccountService";
 export const getAllAccounts = async (req: Request, res: Response) => {
   try {
     const accounts = await accountService.getAllAccounts();
+    console.log(`📊 DB_FETCH: Found ${accounts.length} accounts.`);
     res.json(accounts);
   } catch (err: any) {
     console.error("🔥 ERROR getAllAccounts:", err);

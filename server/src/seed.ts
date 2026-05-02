@@ -12,6 +12,7 @@ async function seed() {
   console.log('🌱 Seeding database...');
   try {
     await AppDataSource.initialize();
+    console.log(`🔗 Connected to: ${AppDataSource.options.type}://${(AppDataSource.options as any).host || 'remote'}`);
     const accountRepository = AppDataSource.getRepository(Account);
 
     for (const acc of initialAccounts) {
