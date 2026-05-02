@@ -10,11 +10,14 @@ interface DashboardProps {
   onRefresh: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions, budget, onRefresh }) => {
+const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budget, onRefresh }) => {
   const currentMonth = format(new Date(), 'yyyy-MM');
   
+  // Ensure transactions is always an array
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+
   // Calculations
-  const monthTransactions = transactions.filter(t => format(new Date(t.date), 'yyyy-MM') === currentMonth);
+  const monthTransactions = safeTransactions.filter(t => format(new Date(t.date), 'yyyy-MM') === currentMonth);
   
   const salaryReceived = monthTransactions
     .filter(t => t.type === 'salary')
