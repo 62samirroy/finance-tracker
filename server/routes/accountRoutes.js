@@ -6,3 +6,4 @@ router.get('/', accountController.getAllAccounts);
 router.put('/:id', accountController.updateAccount);
 
 module.exports = router;
+ 
