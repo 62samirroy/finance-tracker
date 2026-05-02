@@ -1,7 +1,7 @@
 import { AppDataSource } from "../data-source";
 import { Transaction } from "../entities/Transaction";
 import accountService from "./AccountService";
-import { Like, OrderByCondition } from "typeorm";
+import { Like } from "typeorm";
 
 class TransactionService {
   private transactionRepository = AppDataSource.getRepository(Transaction);
@@ -12,7 +12,7 @@ class TransactionService {
       where.type = type;
     }
     if (month) {
-      where.date = Like(`${month}%`); // This might need adjustment based on how TypeORM handles dates/strings
+      where.date = Like(`${month}%`);
     }
 
     return await this.transactionRepository.find({
@@ -34,11 +34,11 @@ class TransactionService {
         amount,
         type,
         category,
-        source_account_id: source_account_id ? Number(source_account_id) : null,
-        destination_account_id: destination_account_id ? Number(destination_account_id) : null,
+        source_account_id: source_account_id ? Number(source_account_id) : undefined,
+        destination_account_id: destination_account_id ? Number(destination_account_id) : undefined,
         note,
         date: date ? new Date(date) : new Date()
-      });
+      } as Partial<Transaction>);
 
       const savedTransaction = await queryRunner.manager.save(transaction);
       await this.applyBalanceEffect(savedTransaction);
@@ -69,8 +69,8 @@ class TransactionService {
       old.amount = amount;
       old.type = type;
       old.category = category;
-      old.source_account_id = source_account_id ? Number(source_account_id) : null;
-      old.destination_account_id = destination_account_id ? Number(destination_account_id) : null;
+      old.source_account_id = source_account_id ? Number(source_account_id) : undefined;
+      old.destination_account_id = destination_account_id ? Number(destination_account_id) : undefined;
       old.note = note;
       old.date = date ? new Date(date) : old.date;
 
