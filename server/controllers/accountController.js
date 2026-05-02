@@ -5,6 +5,7 @@ exports.getAllAccounts = async (req, res) => {
     const accounts = await accountService.getAllAccounts();
     res.json(accounts);
   } catch (err) {
+     console.error("🔥 ERROR getAllAccounts:", err);
     res.status(500).json({ error: err.message });
   }
 };
