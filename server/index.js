@@ -19,7 +19,6 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
- 
 // Health check
 app.get('/', (req, res) => res.send('Finance Tracker API is running'));
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
