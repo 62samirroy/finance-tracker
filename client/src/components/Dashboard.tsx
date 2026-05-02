@@ -16,24 +16,24 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
   // Ensure transactions is always an array
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
 
-  // Calculations
-  const monthTransactions = safeTransactions.filter(t => format(new Date(t.date), 'yyyy-MM') === currentMonth);
+  // Use substring to avoid timezone shift issues when parsing UTC dates
+  const monthTransactions = safeTransactions.filter(t => t.date && t.date.substring(0, 7) === currentMonth);
   
   const salaryReceived = monthTransactions
-    .filter(t => t.type.toLowerCase() === 'salary')
-    .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+    .filter(t => t.type?.toLowerCase() === 'salary')
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const emiPaid = monthTransactions
-    .filter(t => t.type.toLowerCase() === 'emi')
-    .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+    .filter(t => t.type?.toLowerCase() === 'emi')
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const transferredToMaa = monthTransactions
-    .filter(t => t.type.toLowerCase() === 'transfer' && t.destinationAccount?.name?.toLowerCase().includes('maa'))
-    .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+    .filter(t => t.type?.toLowerCase() === 'transfer' && t.destinationAccount?.name?.toLowerCase().includes('maa'))
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const handExpenses = monthTransactions
-    .filter(t => t.type.toLowerCase() === 'expense')
-    .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+    .filter(t => t.type?.toLowerCase() === 'expense')
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
   const maaSavingsTotal = accounts.find(a => a.name.toLowerCase().includes('maa'))?.balance || 0;
   
