@@ -150,7 +150,7 @@ const ExpenseForm: React.FC<Props> = ({ accounts, budget, transactions, onRefres
                     </div>
                     <button 
                       onClick={() => setIsEditingBudget(true)}
-                      className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-500 hover:text-zinc-200 transition-all"
+                      className="p-2 hover:bg-zinc-800 rounded-lg text-white transition-all"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
@@ -252,16 +252,16 @@ const ExpenseForm: React.FC<Props> = ({ accounts, budget, transactions, onRefres
                   <div className="text-right">
                     <p className="text-sm font-black text-rose-400">₹{parseFloat(t.amount).toLocaleString()}</p>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 transition-opacity">
                     <button 
                       onClick={() => setEditingTransaction(t)}
-                      className="p-1.5 hover:bg-zinc-800 rounded-md text-zinc-400 hover:text-zinc-100 transition-colors"
+                      className="p-1.5 hover:bg-zinc-800 rounded-md text-white transition-colors"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button 
                       onClick={() => setDeletingTransaction(t)}
-                      className="p-1.5 hover:bg-rose-500/10 rounded-md text-zinc-400 hover:text-rose-500 transition-colors"
+                      className="p-1.5 hover:bg-red-500/10 rounded-md text-red-500 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

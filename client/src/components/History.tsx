@@ -146,7 +146,7 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
         <div className="mt-10 min-h-[300px]">
           {filteredTransactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 opacity-30">
-              <Calendar className="w-12 h-12 mb-4 text-zinc-500" />
+              <Calendar className="w-12 h-12 mb-4 text-white" />
               <p className="text-sm font-medium text-zinc-500">No matching transactions found</p>
             </div>
           ) : (
@@ -169,10 +169,10 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
                           {format(new Date(t.date), 'dd MMMM yyyy')}
                         </p>
                         <span className="text-zinc-800 text-[10px]">•</span>
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
-                          {t.type === 'salary' ? `Credited to ${t.destination_name}` :
-                           t.type === 'transfer' || t.type === 'self_transfer' ? `${t.source_name} ➔ ${t.destination_name}` :
-                           t.source_name || t.destination_name || 'Cash'}
+                        <p className="text-[10px] text-zinc-500 font-medium">
+                          {t.type === 'salary' ? `Credited to ${t.destinationAccount?.name}` :
+                           t.type === 'transfer' || t.type === 'self_transfer' ? `${t.sourceAccount?.name} ➔ ${t.destinationAccount?.name}` :
+                           t.sourceAccount?.name || t.destinationAccount?.name || 'Cash'}
                         </p>
                       </div>
                       {t.note && <p className="text-[10px] text-zinc-600 mt-1 italic">"{t.note}"</p>}
@@ -184,16 +184,16 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
                         {t.type === 'salary' ? '+' : '-'}₹{parseFloat(t.amount).toLocaleString()}
                       </p>
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 transition-opacity">
                       <button 
                         onClick={() => setEditingTransaction(t)}
-                        className="p-1.5 hover:bg-zinc-800 rounded-md text-zinc-400 hover:text-zinc-100 transition-colors"
+                        className="p-1.5 hover:bg-zinc-800 rounded-md text-white transition-colors"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button 
                         onClick={() => setDeletingTransaction(t)}
-                        className="p-1.5 hover:bg-rose-500/10 rounded-md text-zinc-400 hover:text-rose-500 transition-colors"
+                        className="p-1.5 hover:bg-red-500/10 rounded-md text-red-500 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -209,9 +209,9 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
       <div className="flex justify-center pt-8">
         <button 
           onClick={handleClearAll}
-          className="group flex items-center gap-2 text-zinc-600 hover:text-rose-500 transition-colors py-2 px-4 rounded-lg hover:bg-rose-500/5"
+          className="group flex items-center gap-2 text-zinc-600 hover:text-red-500 transition-colors py-2 px-4 rounded-lg hover:bg-red-500/5"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4 text-red-500" />
           <span className="text-xs font-bold uppercase tracking-widest">Wipe all financial data</span>
         </button>
       </div>

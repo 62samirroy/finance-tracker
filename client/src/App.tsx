@@ -36,7 +36,6 @@ const App: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const [accRes, transRes, budgetRes] = await Promise.all([
         api.get('/accounts'),
         api.get('/transactions'),

@@ -20,22 +20,22 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
   const monthTransactions = safeTransactions.filter(t => format(new Date(t.date), 'yyyy-MM') === currentMonth);
   
   const salaryReceived = monthTransactions
-    .filter(t => t.type === 'salary')
+    .filter(t => t.type.toLowerCase() === 'salary')
     .reduce((acc, t) => acc + parseFloat(t.amount), 0);
     
   const emiPaid = monthTransactions
-    .filter(t => t.type === 'emi')
+    .filter(t => t.type.toLowerCase() === 'emi')
     .reduce((acc, t) => acc + parseFloat(t.amount), 0);
     
   const transferredToMaa = monthTransactions
-    .filter(t => t.type === 'transfer' && t.destination_name?.includes('Maa'))
+    .filter(t => t.type.toLowerCase() === 'transfer' && t.destinationAccount?.name?.toLowerCase().includes('maa'))
     .reduce((acc, t) => acc + parseFloat(t.amount), 0);
     
   const handExpenses = monthTransactions
-    .filter(t => t.type === 'expense')
+    .filter(t => t.type.toLowerCase() === 'expense')
     .reduce((acc, t) => acc + parseFloat(t.amount), 0);
 
-  const maaSavingsTotal = accounts.find(a => a.name.includes('Maa'))?.balance || 0;
+  const maaSavingsTotal = accounts.find(a => a.name.toLowerCase().includes('maa'))?.balance || 0;
   
   const budgetAmountNum = budget ? parseFloat(budget.amount) : 0;
   const pocketLeft = budget ? budgetAmountNum - handExpenses : 0;
@@ -67,7 +67,7 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
         {accounts.map(acc => (
           <div key={acc.id} className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl hover:border-zinc-700 transition-colors cursor-default">
             <p className="text-[10px] text-zinc-500 font-medium uppercase mb-1">{acc.name}</p>
-            <p className={`text-xl font-bold ${acc.name.includes('Maa') ? 'text-emerald-500/90' : 'text-zinc-200'}`}>
+            <p className={`text-xl font-bold ${acc.name.toLowerCase().includes('maa') ? 'text-emerald-500/90' : 'text-zinc-200'}`}>
               ₹{parseFloat(acc.balance).toLocaleString()}
             </p>
           </div>

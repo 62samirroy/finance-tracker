@@ -356,7 +356,7 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
       <div className="bg-zinc-900/30 border border-zinc-800 p-6 rounded-2xl">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-zinc-800 rounded-lg">
-            <Calendar className="w-4 h-4 text-zinc-400" />
+            <Calendar className="w-4 h-4 text-white" />
           </div>
           <h3 className="text-sm font-semibold text-zinc-200">Recent Salary & Transfers</h3>
         </div>
@@ -381,9 +381,9 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                     <p className="text-sm font-bold text-zinc-200">{t.category || t.type.replace('_', ' ')}</p>
                     <p className="text-[10px] text-zinc-500 font-medium">
                       {format(new Date(t.date), 'dd MMM yyyy')} • {
-                        t.type === 'salary' ? `Credited to ${t.destination_name}` :
-                        t.type === 'transfer' || t.type === 'self_transfer' ? `${t.source_name} ➔ ${t.destination_name}` :
-                        t.source_name || t.destination_name
+                        t.type === 'salary' ? `Credited to ${t.destinationAccount?.name}` :
+                        t.type === 'transfer' || t.type === 'self_transfer' ? `${t.sourceAccount?.name} ➔ ${t.destinationAccount?.name}` :
+                        t.sourceAccount?.name || t.destinationAccount?.name
                       }
                     </p>
                   </div>
@@ -394,16 +394,16 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                       {t.type === 'salary' ? '+' : '-'}₹{parseFloat(t.amount).toLocaleString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 transition-opacity">
                     <button 
                       onClick={() => setEditingTransaction(t)}
-                      className="p-1.5 hover:bg-zinc-800 rounded-md text-zinc-400 hover:text-zinc-100 transition-colors"
+                      className="p-1.5 hover:bg-zinc-800 rounded-md text-white transition-colors"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button 
                       onClick={() => setDeletingTransaction(t)}
-                      className="p-1.5 hover:bg-rose-500/10 rounded-md text-zinc-400 hover:text-rose-500 transition-colors"
+                      className="p-1.5 hover:bg-red-500/10 rounded-md text-red-500 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

@@ -20,8 +20,8 @@ export interface Transaction {
   category?: string;
   source_account_id?: number;
   destination_account_id?: number;
-  source_name?: string;
-  destination_name?: string;
+  sourceAccount?: { name: string };
+  destinationAccount?: { name: string };
   note?: string;
   date: string;
 }
