@@ -58,23 +58,43 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 async function seedInitialData() {
   try {
     const accountRepository = AppDataSource.getRepository(Account);
-    const count = await accountRepository.count();
-    if (count === 0) {
-      console.log("🌱 No accounts found. Seeding initial data...");
-      const initialAccounts = [
-        { name: 'Punjab Bank', balance: 0 },
-        { name: 'SBI Bank', balance: 0 },
-        { name: 'Jio Payments', balance: 0 },
-        { name: 'Maa Savings', balance: 0 }
-      ];
-      for (const acc of initialAccounts) {
-        const newAccount = accountRepository.create(acc);
-        await accountRepository.save(newAccount);
+    const initialAccounts = [
+      { name: 'Punjab', balance: 90.00 },
+      { name: 'SBI', balance: 436.00 },
+      { name: 'Jio', balance: 2602.00 },
+      { name: 'Maa', balance: 31000.00 }
+    ];
+
+    for (const acc of initialAccounts) {
+      // Check for exact name
+      let account = await accountRepository.findOneBy({ name: acc.name });
+      
+      // If not found, check if an "old" version exists to rename it
+      if (!account) {
+        const oldName = acc.name === 'Punjab' ? 'Punjab Bank' : 
+                        acc.name === 'SBI' ? 'SBI Bank' :
+                        acc.name === 'Jio' ? 'Jio Payments' :
+                        acc.name === 'Maa' ? 'Maa Savings' : null;
+        
+        if (oldName) {
+          account = await accountRepository.findOneBy({ name: oldName });
+          if (account) {
+            console.log(`🔄 Updating ${oldName} to ${acc.name}`);
+            account.name = acc.name;
+          }
+        }
       }
-      console.log("✨ Seeding completed!");
-    } else {
-      console.log(`📊 Database already has ${count} accounts.`);
+
+      if (!account) {
+        console.log(`🌱 Creating account: ${acc.name}`);
+        account = accountRepository.create(acc);
+      }
+
+      // Always ensure the balance matches your provided data for this sync
+      account.balance = acc.balance;
+      await accountRepository.save(account);
     }
+    console.log("✨ Account sync completed!");
   } catch (err) {
     console.error("❌ Seeding failed:", err);
   }
