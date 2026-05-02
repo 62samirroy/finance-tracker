@@ -35,14 +35,7 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const handExpenses = monthTransactions
-    .filter(t => {
-      const type = t.type?.toLowerCase();
-      const isMaa = t.destinationAccount?.name?.toLowerCase().includes('maa') || t.category?.toLowerCase().includes('maa');
-      // Hand expenses are outgoing transactions (expenses, transfers, or withdrawals) 
-      // that are NOT EMIs, NOT salaries, NOT self-transfers, and NOT transfers to Maa.
-      const isOutgoing = ['expense'].includes(type || '');
-      return isOutgoing && !isMaa;
-    })
+    .filter(t => t.type?.toLowerCase() === 'expense')
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
   const maaSavingsTotal = accounts.find(a => a.name.toLowerCase().includes('maa'))?.balance || 0;
