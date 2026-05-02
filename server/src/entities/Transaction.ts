@@ -15,11 +15,11 @@ export class Transaction {
   @Column({ nullable: true })
   category?: string;
 
-  @Column({ nullable: true })
-  source_account_id?: number;
+  @Column({ type: "int", nullable: true })
+  source_account_id?: number | null;
 
-  @Column({ nullable: true })
-  destination_account_id?: number;
+  @Column({ type: "int", nullable: true })
+  destination_account_id?: number | null;
 
   @Column({ nullable: true })
   note?: string;
