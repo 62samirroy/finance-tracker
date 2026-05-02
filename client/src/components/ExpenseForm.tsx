@@ -203,13 +203,11 @@ const ExpenseForm: React.FC<Props> = ({ accounts, budget, transactions, onRefres
                 <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Paid from</label>
                 <select name="from" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 appearance-none transition-colors" required>
                   <option value="">Select Bank</option>
-                  {accounts
-                    .filter(a => a.name && !a.name.toLowerCase().includes('maa'))
-                    .map(acc => (
-                      <option key={acc.id} value={acc.id}>
-                        {acc.name.toLowerCase().includes('bank') ? acc.name : `${acc.name} Bank`}
-                      </option>
-                    ))}
+                  {accounts.map(acc => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.name || `Account #${acc.id}`}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -310,13 +308,11 @@ const ExpenseForm: React.FC<Props> = ({ accounts, budget, transactions, onRefres
                   <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Paid from</label>
                   <select name="from" defaultValue={editingTransaction.source_account_id || ''} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 appearance-none" required>
                     <option value="">Select Bank</option>
-                    {accounts
-                      .filter(a => a.name && !a.name.toLowerCase().includes('maa'))
-                      .map(acc => (
-                        <option key={acc.id} value={acc.id}>
-                          {acc.name.toLowerCase().includes('bank') ? acc.name : `${acc.name} Bank`}
-                        </option>
-                      ))}
+                    {accounts.map(acc => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name || `Account #${acc.id}`}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

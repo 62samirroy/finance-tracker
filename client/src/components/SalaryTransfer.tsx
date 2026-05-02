@@ -206,13 +206,11 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                   <div className="w-full space-y-1.5">
                     <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">To bank</label>
                     <select name="to" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 appearance-none" required>
-                      {accounts
-                        .filter(a => a.name && !a.name.toLowerCase().includes('maa'))
-                        .map(acc => (
-                          <option key={acc.id} value={acc.id}>
-                            {acc.name.toLowerCase().includes('bank') ? acc.name : `${acc.name} Bank`}
-                          </option>
-                        ))}
+                    {accounts.map(acc => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name || `Account #${acc.id}`}
+                      </option>
+                    ))}
                     </select>
                   </div>
                 </div>
@@ -277,11 +275,11 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                   <div className="space-y-1.5">
                     <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">To Maa Account</label>
                     <select name="to" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 appearance-none" required>
-                      {accounts
-                        .filter(a => a.name && a.name.toLowerCase().includes('maa'))
-                        .map(acc => (
-                          <option key={acc.id} value={acc.id}>{acc.name}</option>
-                        ))}
+                      {accounts.map(acc => (
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name || `Account #${acc.id}`}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
