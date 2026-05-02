@@ -17,12 +17,13 @@ class AccountService {
     return await this.getAccountById(id);
   }
 
-  async adjustBalance(id: number | undefined, amount: number) {
+  async adjustBalance(id: number | undefined | null, amount: number, manager?: any) {
     if (!id) return;
-    const account = await this.getAccountById(id);
+    const repo = manager ? manager.getRepository(Account) : this.accountRepository;
+    const account = await repo.findOneBy({ id });
     if (account) {
       account.balance = Number(account.balance) + amount;
-      await this.accountRepository.save(account);
+      await repo.save(account);
     }
   }
 }

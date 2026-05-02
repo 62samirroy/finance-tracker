@@ -41,7 +41,7 @@ class TransactionService {
       } as Partial<Transaction>);
 
       const savedTransaction = await queryRunner.manager.save(transaction);
-      await this.applyBalanceEffect(savedTransaction);
+      await this.applyBalanceEffect(savedTransaction, queryRunner.manager);
 
       await queryRunner.commitTransaction();
       return savedTransaction;
@@ -61,21 +61,21 @@ class TransactionService {
     await queryRunner.startTransaction();
 
     try {
-      const old = await this.transactionRepository.findOneBy({ id });
+      const old = await queryRunner.manager.findOneBy(Transaction, { id });
       if (!old) throw new Error('Transaction not found');
 
-      await this.reverseBalanceEffect(old);
+      await this.reverseBalanceEffect(old, queryRunner.manager);
 
       old.amount = amount;
       old.type = type;
       old.category = category;
-      old.source_account_id = source_account_id ? Number(source_account_id) : undefined;
-      old.destination_account_id = destination_account_id ? Number(destination_account_id) : undefined;
+      old.source_account_id = source_account_id ? Number(source_account_id) : null;
+      old.destination_account_id = destination_account_id ? Number(destination_account_id) : null;
       old.note = note;
       old.date = date ? new Date(date) : old.date;
 
       const updated = await queryRunner.manager.save(old);
-      await this.applyBalanceEffect(updated);
+      await this.applyBalanceEffect(updated, queryRunner.manager);
 
       await queryRunner.commitTransaction();
       return updated;
@@ -93,10 +93,10 @@ class TransactionService {
     await queryRunner.startTransaction();
 
     try {
-      const old = await this.transactionRepository.findOneBy({ id });
+      const old = await queryRunner.manager.findOneBy(Transaction, { id });
       if (!old) throw new Error('Transaction not found');
 
-      await this.reverseBalanceEffect(old);
+      await this.reverseBalanceEffect(old, queryRunner.manager);
       await queryRunner.manager.remove(old);
 
       await queryRunner.commitTransaction();
@@ -109,27 +109,27 @@ class TransactionService {
     }
   }
 
-  async applyBalanceEffect(t: Transaction) {
+  async applyBalanceEffect(t: Transaction, manager?: any) {
     const amount = Number(t.amount);
     if (t.type === 'salary') {
-      await accountService.adjustBalance(t.destination_account_id, amount);
+      await accountService.adjustBalance(t.destination_account_id, amount, manager);
     } else if (t.type === 'transfer' || t.type === 'self_transfer') {
-      await accountService.adjustBalance(t.source_account_id, -amount);
-      await accountService.adjustBalance(t.destination_account_id, amount);
+      await accountService.adjustBalance(t.source_account_id, -amount, manager);
+      await accountService.adjustBalance(t.destination_account_id, amount, manager);
     } else if (t.type === 'expense' || t.type === 'emi' || t.type === 'budget_withdraw') {
-      await accountService.adjustBalance(t.source_account_id, -amount);
+      await accountService.adjustBalance(t.source_account_id, -amount, manager);
     }
   }
 
-  async reverseBalanceEffect(t: Transaction) {
+  async reverseBalanceEffect(t: Transaction, manager?: any) {
     const amount = Number(t.amount);
     if (t.type === 'salary') {
-      await accountService.adjustBalance(t.destination_account_id, -amount);
+      await accountService.adjustBalance(t.destination_account_id, -amount, manager);
     } else if (t.type === 'transfer' || t.type === 'self_transfer') {
-      await accountService.adjustBalance(t.source_account_id, amount);
-      await accountService.adjustBalance(t.destination_account_id, -amount);
+      await accountService.adjustBalance(t.source_account_id, amount, manager);
+      await accountService.adjustBalance(t.destination_account_id, -amount, manager);
     } else if (t.type === 'expense' || t.type === 'emi' || t.type === 'budget_withdraw') {
-      await accountService.adjustBalance(t.source_account_id, amount);
+      await accountService.adjustBalance(t.source_account_id, amount, manager);
     }
   }
 }
