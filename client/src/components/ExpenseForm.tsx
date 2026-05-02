@@ -42,15 +42,24 @@ const ExpenseForm: React.FC<Props> = ({ accounts, budget, transactions, onRefres
 
   const categories = ['Petrol', 'Food', 'Shopping', 'Car Wash', 'Medicine', 'Other'];
 
-  const recentExpenses = transactions
-    .filter(t => t.type === 'expense')
-    .slice(0, 10);
+  const currentMonthStr = format(new Date(), 'yyyy-MM');
+  const monthExpenses = transactions.filter(t => {
+    if (t.type !== 'expense' || !t.date) return false;
+    // Standardize with Dashboard: Use UTC comparison to avoid timezone shifts
+    const tDate = new Date(t.date);
+    const now = new Date();
+    return tDate.getUTCFullYear() === now.getFullYear() && tDate.getUTCMonth() === now.getMonth();
+  });
 
-  const spentTotal = recentExpenses.reduce((acc, t) => acc + parseFloat(t.amount), 0);
+  const spentTotal = monthExpenses.reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
   const budgetAmount = budget ? parseFloat(budget.amount) : 0;
   const budgetProgress = budget ? (spentTotal / budgetAmount) * 100 : 0;
   const pocketLeft = budget ? budgetAmount - spentTotal : 0;
+
+  const recentExpenses = transactions
+    .filter(t => t.type === 'expense')
+    .slice(0, 10);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

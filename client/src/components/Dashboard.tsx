@@ -37,7 +37,7 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const handExpenses = monthTransactions
-    .filter(t => t.type?.toLowerCase() === 'expense')
+    .filter(t => t.type?.toLowerCase().includes('expense') || t.category?.toLowerCase().includes('expense'))
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
   const maaSavingsTotal = accounts.find(a => a.name.toLowerCase().includes('maa'))?.balance || 0;
