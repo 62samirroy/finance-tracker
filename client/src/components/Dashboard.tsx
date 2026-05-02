@@ -38,12 +38,10 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
     .filter(t => {
       const type = t.type?.toLowerCase();
       const isMaa = t.destinationAccount?.name?.toLowerCase().includes('maa') || t.category?.toLowerCase().includes('maa');
-      // Hand expenses are all outgoing transactions that are NOT salary, NOT EMI, NOT self-transfer, and NOT to Maa
-      return (type === 'expense') && 
-             type !== 'salary' && 
-             type !== 'emi' && 
-             type !== 'self_transfer' && 
-             !isMaa;
+      // Hand expenses are outgoing transactions (expenses, transfers, or withdrawals) 
+      // that are NOT EMIs, NOT salaries, NOT self-transfers, and NOT transfers to Maa.
+      const isOutgoing = ['expense'].includes(type || '');
+      return isOutgoing && !isMaa;
     })
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
