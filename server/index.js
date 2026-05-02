@@ -14,7 +14,15 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Routes
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// Health check
+app.get('/', (req, res) => res.send('Finance Tracker API is running'));
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/accounts', accountRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);
