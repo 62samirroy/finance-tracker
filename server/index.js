@@ -8,7 +8,11 @@ const budgetRoutes = require('./routes/budgetRoutes');
 
 const app = express();
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: [
+    'https://finance-tracker-eight-ecru.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
