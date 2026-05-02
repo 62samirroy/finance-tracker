@@ -16,15 +16,20 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
   // Ensure transactions is always an array
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
 
-  // Use substring to avoid timezone shift issues when parsing UTC dates
-  const monthTransactions = safeTransactions.filter(t => t.date && t.date.substring(0, 7) === currentMonth);
+  // Robust month filtering that avoids timezone shifts
+  const monthTransactions = safeTransactions.filter(t => {
+    if (!t.date) return false;
+    const tDate = new Date(t.date);
+    const now = new Date();
+    return tDate.getUTCFullYear() === now.getFullYear() && (tDate.getUTCMonth()) === now.getMonth();
+  });
   
   const salaryReceived = monthTransactions
-    .filter(t => t.type?.toLowerCase() === 'salary')
+    .filter(t => t.type?.toLowerCase().includes('salary') || t.category?.toLowerCase().includes('salary'))
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const emiPaid = monthTransactions
-    .filter(t => t.type?.toLowerCase() === 'emi')
+    .filter(t => t.type?.toLowerCase().includes('emi') || t.category?.toLowerCase().includes('emi'))
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     
   const transferredToMaa = monthTransactions
