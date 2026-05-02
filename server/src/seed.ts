@@ -1,4 +1,5 @@
-const db = require('./db');
+import { AppDataSource } from "./data-source";
+import { Account } from "./entities/Account";
 
 const initialAccounts = [
   { name: 'Punjab Bank', balance: 0 },
@@ -10,11 +11,14 @@ const initialAccounts = [
 async function seed() {
   console.log('🌱 Seeding database...');
   try {
+    await AppDataSource.initialize();
+    const accountRepository = AppDataSource.getRepository(Account);
+
     for (const acc of initialAccounts) {
-      // Check if account already exists to avoid duplicates
-      const existing = await db.query('SELECT * FROM accounts WHERE name = $1', [acc.name]);
-      if (existing.rows.length === 0) {
-        await db.query('INSERT INTO accounts (name, balance) VALUES ($1, $2)', [acc.name, acc.balance]);
+      const existing = await accountRepository.findOneBy({ name: acc.name });
+      if (!existing) {
+        const newAccount = accountRepository.create(acc);
+        await accountRepository.save(newAccount);
         console.log(`✅ Created account: ${acc.name}`);
       } else {
         console.log(`ℹ️ Account already exists: ${acc.name}`);
