@@ -6,6 +6,7 @@ import accountRoutes from "./routes/accountRoutes";
 import transactionRoutes from "./routes/transactionRoutes";
 import budgetRoutes from "./routes/budgetRoutes";
 import upcomingExpenseRoutes from "./routes/upcomingExpenseRoutes";
+import lentMoneyRoutes from "./routes/lentMoneyRoutes";
 import { Account } from "./entities/Account";
 
 dotenv.config();
@@ -50,6 +51,7 @@ app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/upcoming-expenses", upcomingExpenseRoutes);
+app.use("/api/lent-money", lentMoneyRoutes);
 
 // Error logging middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -5,6 +5,7 @@ import { Account } from "./entities/Account";
 import { Transaction } from "./entities/Transaction";
 import { Budget } from "./entities/Budget";
 import { UpcomingExpense } from "./entities/UpcomingExpense";
+import { LentMoney } from "./entities/LentMoney";
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
     url: process.env.DATABASE_URL,
     synchronize: true, // Be careful with this in production
     logging: false,
-    entities: [Account, Transaction, Budget, UpcomingExpense],
+    entities: [Account, Transaction, Budget, UpcomingExpense, LentMoney],
     migrations: [],
     subscribers: [],
     extra: {

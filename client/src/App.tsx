@@ -22,8 +22,10 @@ import SalaryTransfer from './components/SalaryTransfer';
 import ExpenseForm from './components/ExpenseForm';
 import AccountManager from './components/AccountManager';
 import History from './components/History';
+import LentMoneyManager from './components/LentMoneyManager';
 import { format } from 'date-fns';
 import { ToastProvider } from './context/ToastContext';
+
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -31,22 +33,25 @@ const App: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budget, setBudget] = useState<Budget | null>(null);
   const [upcomingExpenses, setUpcomingExpenses] = useState<any[]>([]);
+  const [lentRecords, setLentRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const currentMonth = format(new Date(), 'yyyy-MM');
 
   const fetchData = async () => {
     try {
-      const [accRes, transRes, budgetRes, upcomingRes] = await Promise.all([
+      const [accRes, transRes, budgetRes, upcomingRes, lentRes] = await Promise.all([
         api.get('/accounts'),
         api.get('/transactions'),
         api.get(`/budgets/${currentMonth}`),
-        api.get('/upcoming-expenses')
+        api.get('/upcoming-expenses'),
+        api.get('/lent-money')
       ]);
       setAccounts(accRes.data);
       setTransactions(transRes.data);
       setBudget(budgetRes.data);
       setUpcomingExpenses(upcomingRes.data);
+      setLentRecords(lentRes.data);
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {
@@ -62,6 +67,7 @@ const App: React.FC = () => {
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'salary', label: 'Salary & Transfer' },
     { id: 'expense', label: 'Expenses' },
+    { id: 'lent', label: 'Borrowed/Lent' },
     { id: 'accounts', label: 'Accounts' },
     { id: 'history', label: 'All Transactions' },
   ];
@@ -116,6 +122,13 @@ const App: React.FC = () => {
                 budget={budget}
                 transactions={transactions}
                 upcomingExpenses={upcomingExpenses}
+                onRefresh={fetchData}
+              />
+            )}
+            {activeTab === 'lent' && (
+              <LentMoneyManager 
+                lentRecords={lentRecords}
+                accounts={accounts}
                 onRefresh={fetchData}
               />
             )}

@@ -41,3 +41,15 @@ export interface UpcomingExpense {
   expected_date: string;
   created_at?: string;
 }
+
+export interface LentMoney {
+  id: number;
+  person_name: string;
+  amount: string;
+  type: 'lent' | 'borrowed';
+  status: 'pending' | 'repaid';
+  date: string;
+  repaid_date?: string;
+  note?: string;
+  created_at?: string;
+}
