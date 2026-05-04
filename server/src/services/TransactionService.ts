@@ -111,7 +111,7 @@ class TransactionService {
 
   async applyBalanceEffect(t: Transaction, manager?: any) {
     const amount = Number(t.amount);
-    if (t.type === 'salary') {
+    if (t.type === 'salary' || t.type === 'received_money') {
       await accountService.adjustBalance(t.destination_account_id, amount, manager);
     } else if (t.type === 'transfer' || t.type === 'self_transfer') {
       await accountService.adjustBalance(t.source_account_id, -amount, manager);
@@ -121,9 +121,10 @@ class TransactionService {
     }
   }
 
+
   async reverseBalanceEffect(t: Transaction, manager?: any) {
     const amount = Number(t.amount);
-    if (t.type === 'salary') {
+    if (t.type === 'salary' || t.type === 'received_money') {
       await accountService.adjustBalance(t.destination_account_id, -amount, manager);
     } else if (t.type === 'transfer' || t.type === 'self_transfer') {
       await accountService.adjustBalance(t.source_account_id, amount, manager);

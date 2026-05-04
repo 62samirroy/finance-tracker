@@ -62,11 +62,12 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
   };
 
   const filteredTransactions = transactions.filter(t => 
-    ['salary', 'self_transfer', 'transfer', 'emi'].includes(t.type)
+    ['salary', 'self_transfer', 'transfer', 'emi', 'received_money'].includes(t.type)
   ).slice(0, 10);
 
   const subTabs = [
     { id: 'salary', label: 'Salary', icon: '💰' },
+    { id: 'received_money', label: 'Received money', icon: '📥' },
     { id: 'self_transfer', label: 'Self Transfer', icon: '🔄' },
     { id: 'transfer_maa', label: 'To Maa', icon: '👩' },
     { id: 'emi', label: 'EMI', icon: '📋' },
@@ -148,6 +149,64 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                 </div>
                 <button type="submit" disabled={loading} className="w-full bg-zinc-800 border border-zinc-700 py-3 rounded-xl text-sm font-bold text-zinc-200 hover:bg-zinc-700 hover:text-white transition-all transform active:scale-[0.98] shadow-lg">
                   Add Salary ↗
+                </button>
+              </form>
+            </div>
+          )}
+
+          {activeSubTab === 'received_money' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="p-2 bg-emerald-500/10 rounded-lg">
+                  <span className="text-emerald-500 text-lg">📥</span>
+                </div>
+                <h3 className="text-sm font-semibold text-zinc-200">Received money (from others)</h3>
+              </div>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                handleSubmit('received_money', {
+                  amount: formData.get('amount'),
+                  destination_account_id: formData.get('dest'),
+                  note: formData.get('note'),
+                  category: 'Received from others',
+                  date: formData.get('date') ? new Date(formData.get('date') as string) : new Date()
+                });
+                e.currentTarget.reset();
+              }} className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Amount</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₹</span>
+                      <input name="amount" type="number" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 transition-colors" required />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Date</label>
+                    <input name="date" type="date" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 transition-colors" defaultValue={format(new Date(), 'yyyy-MM-dd')} required />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Received in bank</label>
+                    <select name="dest" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 appearance-none" required>
+                    {accounts
+                      .filter(a => a.name && !a.name.toLowerCase().includes('maa'))
+                      .map(acc => (
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name.toLowerCase().includes('bank') ? acc.name : `${acc.name} Bank`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Note</label>
+                    <input name="note" placeholder="Who sent it?" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 transition-colors" />
+                  </div>
+                </div>
+                <button type="submit" disabled={loading} className="w-full bg-zinc-800 border border-zinc-700 py-3 rounded-xl text-sm font-bold text-zinc-200 hover:bg-zinc-700 hover:text-white transition-all transform active:scale-[0.98] shadow-lg">
+                  Record Received Money 📥
                 </button>
               </form>
             </div>
@@ -372,16 +431,17 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
                     t.type === 'salary' ? 'bg-amber-500/10 text-amber-500' :
+                    t.type === 'received_money' ? 'bg-emerald-500/10 text-emerald-500' :
                     t.type === 'emi' ? 'bg-orange-500/10 text-orange-500' :
                     'bg-sky-500/10 text-sky-500'
                   }`}>
-                    {t.type === 'salary' ? '💰' : t.type === 'emi' ? '📄' : '🔄'}
+                    {t.type === 'salary' ? '💰' : t.type === 'received_money' ? '📥' : t.type === 'emi' ? '📄' : '🔄'}
                   </div>
                   <div>
                     <p className="text-sm font-bold text-zinc-200">{t.category || t.type.replace('_', ' ')}</p>
                     <p className="text-[10px] text-zinc-500 font-medium">
                       {format(new Date(t.date), 'dd MMM yyyy')} • {
-                        t.type === 'salary' ? `Credited to ${t.destinationAccount?.name}` :
+                        t.type === 'salary' || t.type === 'received_money' ? `Credited to ${t.destinationAccount?.name}` :
                         t.type === 'transfer' || t.type === 'self_transfer' ? `${t.sourceAccount?.name} ➔ ${t.destinationAccount?.name}` :
                         t.sourceAccount?.name || t.destinationAccount?.name
                       }
@@ -390,8 +450,8 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className={`text-sm font-black ${t.type === 'salary' ? 'text-emerald-400' : 'text-zinc-100'}`}>
-                      {t.type === 'salary' ? '+' : '-'}₹{parseFloat(t.amount).toLocaleString()}
+                    <p className={`text-sm font-black ${t.type === 'salary' || t.type === 'received_money' ? 'text-emerald-400' : 'text-zinc-100'}`}>
+                      {t.type === 'salary' || t.type === 'received_money' ? '+' : '-'}₹{parseFloat(t.amount).toLocaleString()}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 transition-opacity">
