@@ -26,6 +26,7 @@ import LentMoneyManager from './components/LentMoneyManager';
 import { format } from 'date-fns';
 import { ToastProvider } from './context/ToastContext';
 
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [accounts, setAccounts] = useState<Account[]>([]);
