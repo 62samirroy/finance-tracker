@@ -16,7 +16,7 @@ export interface Account {
 export interface Transaction {
   id: number;
   amount: string;
-  type: 'salary' | 'transfer' | 'expense' | 'emi' | 'budget_withdraw' | 'self_transfer';
+  type: 'salary' | 'transfer' | 'expense' | 'emi' | 'budget_withdraw' | 'self_transfer' | 'received_money';
   category?: string;
   source_account_id?: number;
   destination_account_id?: number;

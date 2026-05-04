@@ -17,7 +17,7 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
 
   const currentMonthStr = format(new Date(), 'yyyy-MM');
-  const monthTransactions = safeTransactions.filter(t => t.date && t.date.substring(0, 7) === currentMonthStr);
+  const monthTransactions = safeTransactions.filter(t => t.date && format(new Date(t.date), 'yyyy-MM') === currentMonthStr);
   
   const salaryReceived = monthTransactions
     .filter(t => t.type?.toLowerCase().includes('salary') || t.category?.toLowerCase().includes('salary'))
@@ -38,6 +38,10 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
     .filter(t => t.type?.toLowerCase() === 'expense')
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
+  const receivedFromOthers = monthTransactions
+    .filter(t => t.type?.toLowerCase() === 'received_money' || t.category?.toLowerCase().includes('received from others'))
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
+
   const maaSavingsTotal = accounts.find(a => a.name.toLowerCase().includes('maa'))?.balance || 0;
   
   const budgetAmountNum = budget ? parseFloat(budget.amount) : 0;
@@ -46,10 +50,14 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
   return (
     <div className="space-y-6">
       {/* Top Summary Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl">
           <p className="text-[10px] text-zinc-500 font-medium uppercase mb-1">This month salary</p>
-          <p className="text-xl font-bold text-sky-400">₹{salaryReceived.toLocaleString()}</p>
+          <p className="text-xl font-bold text-amber-500">₹{salaryReceived.toLocaleString()}</p>
+        </div>
+        <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl">
+          <p className="text-[10px] text-zinc-500 font-medium uppercase mb-1">Received from others</p>
+          <p className="text-xl font-bold text-emerald-400">₹{receivedFromOthers.toLocaleString()}</p>
         </div>
         <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl">
           <p className="text-[10px] text-zinc-500 font-medium uppercase mb-1">Maa's savings total</p>
@@ -86,6 +94,10 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
             <span className="text-sm font-medium text-emerald-400">₹{salaryReceived.toLocaleString()}</span>
           </div>
           <div className="flex justify-between items-center pb-3 border-b border-zinc-800/50">
+            <span className="text-sm text-zinc-400">Received from others</span>
+            <span className="text-sm font-medium text-emerald-400">₹{receivedFromOthers.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between items-center pb-3 border-b border-zinc-800/50">
             <span className="text-sm text-zinc-400">EMI paid (to friend)</span>
             <span className="text-sm font-medium text-rose-400">-₹{emiPaid.toLocaleString()}</span>
           </div>
@@ -99,7 +111,7 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
           </div>
           <div className="flex justify-between items-center pt-2">
             <span className="text-base font-bold text-zinc-200">Balance in hand</span>
-            <span className="text-base font-bold text-emerald-400">₹{(salaryReceived - emiPaid - transferredToMaa - handExpenses).toLocaleString()}</span>
+            <span className="text-base font-bold text-emerald-400">₹{(salaryReceived + receivedFromOthers - emiPaid - transferredToMaa - handExpenses).toLocaleString()}</span>
           </div>
         </div>
       </div>

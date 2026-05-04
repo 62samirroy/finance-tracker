@@ -101,6 +101,7 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
               >
                 <option value="all">All Types</option>
                 <option value="salary">Salary</option>
+                <option value="received_money">Received Money</option>
                 <option value="expense">Expense</option>
                 <option value="transfer">Transfer</option>
                 <option value="emi">EMI</option>
@@ -155,12 +156,13 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
                 <div key={t.id} className="grid grid-cols-[1fr_auto] items-center p-4 rounded-xl bg-zinc-950/40 border border-zinc-900/50 hover:bg-zinc-900/40 hover:border-zinc-800 transition-all group">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
-                      t.type === 'salary' ? 'bg-emerald-500/10 text-emerald-500' :
+                      t.type === 'salary' ? 'bg-amber-500/10 text-amber-500' :
+                      t.type === 'received_money' ? 'bg-emerald-500/10 text-emerald-500' :
                       t.type === 'expense' ? 'bg-rose-500/10 text-rose-500' :
                       t.type === 'emi' ? 'bg-orange-500/10 text-orange-500' :
                       'bg-sky-500/10 text-sky-500'
                     }`}>
-                      {t.type === 'salary' ? '💰' : t.type === 'expense' ? '💸' : t.type === 'emi' ? '📄' : '🔄'}
+                      {t.type === 'salary' ? '💰' : t.type === 'received_money' ? '📥' : t.type === 'expense' ? '💸' : t.type === 'emi' ? '📄' : '🔄'}
                     </div>
                     <div>
                       <p className="text-sm font-bold text-zinc-100">{t.category || t.type.replace('_', ' ')}</p>
@@ -170,7 +172,7 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
                         </p>
                         <span className="text-zinc-800 text-[10px]">•</span>
                         <p className="text-[10px] text-zinc-500 font-medium">
-                          {t.type === 'salary' ? `Credited to ${t.destinationAccount?.name}` :
+                          {t.type === 'salary' || t.type === 'received_money' ? `Credited to ${t.destinationAccount?.name}` :
                            t.type === 'transfer' || t.type === 'self_transfer' ? `${t.sourceAccount?.name} ➔ ${t.destinationAccount?.name}` :
                            t.sourceAccount?.name || t.destinationAccount?.name || 'Cash'}
                         </p>
@@ -180,8 +182,8 @@ const History: React.FC<Props> = ({ transactions, accounts, onRefresh }) => {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className={`text-base font-black ${t.type === 'salary' ? 'text-emerald-400' : 'text-zinc-100'}`}>
-                        {t.type === 'salary' ? '+' : '-'}₹{parseFloat(t.amount).toLocaleString()}
+                      <p className={`text-base font-black ${t.type === 'salary' ? 'text-amber-500' : t.type === 'received_money' ? 'text-emerald-400' : 'text-zinc-100'}`}>
+                        {t.type === 'salary' || t.type === 'received_money' ? '+' : '-'}₹{parseFloat(t.amount).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex items-center gap-1 transition-opacity">
