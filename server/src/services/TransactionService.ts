@@ -121,6 +121,7 @@ class TransactionService {
     }
   }
 
+
   async reverseBalanceEffect(t: Transaction, manager?: any) {
     const amount = Number(t.amount);
     if (t.type === 'salary' || t.type === 'received_money') {
