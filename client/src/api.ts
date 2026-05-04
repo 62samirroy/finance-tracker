@@ -32,3 +32,12 @@ export interface Budget {
   amount: string;
   withdrawn_from_account_id?: number;
 }
+
+export interface UpcomingExpense {
+  id: number;
+  amount: string;
+  category: string;
+  note?: string;
+  expected_date: string;
+  created_at?: string;
+}

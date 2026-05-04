@@ -30,20 +30,23 @@ const App: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budget, setBudget] = useState<Budget | null>(null);
+  const [upcomingExpenses, setUpcomingExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const currentMonth = format(new Date(), 'yyyy-MM');
 
   const fetchData = async () => {
     try {
-      const [accRes, transRes, budgetRes] = await Promise.all([
+      const [accRes, transRes, budgetRes, upcomingRes] = await Promise.all([
         api.get('/accounts'),
         api.get('/transactions'),
-        api.get(`/budgets/${currentMonth}`)
+        api.get(`/budgets/${currentMonth}`),
+        api.get('/upcoming-expenses')
       ]);
       setAccounts(accRes.data);
       setTransactions(transRes.data);
       setBudget(budgetRes.data);
+      setUpcomingExpenses(upcomingRes.data);
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {
@@ -112,6 +115,7 @@ const App: React.FC = () => {
                 accounts={accounts} 
                 budget={budget}
                 transactions={transactions}
+                upcomingExpenses={upcomingExpenses}
                 onRefresh={fetchData}
               />
             )}

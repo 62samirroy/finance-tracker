@@ -5,6 +5,7 @@ import { AppDataSource } from "./data-source";
 import accountRoutes from "./routes/accountRoutes";
 import transactionRoutes from "./routes/transactionRoutes";
 import budgetRoutes from "./routes/budgetRoutes";
+import upcomingExpenseRoutes from "./routes/upcomingExpenseRoutes";
 import { Account } from "./entities/Account";
 
 dotenv.config();
@@ -48,6 +49,7 @@ app.get("/api/health", (req, res) => res.json({
 app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/budgets", budgetRoutes);
+app.use("/api/upcoming-expenses", upcomingExpenseRoutes);
 
 // Error logging middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
