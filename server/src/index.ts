@@ -7,7 +7,11 @@ import transactionRoutes from "./routes/transactionRoutes";
 import budgetRoutes from "./routes/budgetRoutes";
 import upcomingExpenseRoutes from "./routes/upcomingExpenseRoutes";
 import lentMoneyRoutes from "./routes/lentMoneyRoutes";
+import authRoutes from "./routes/authRoutes";
+import { authMiddleware } from "./middleware/authMiddleware";
 import { Account } from "./entities/Account";
+import { User } from "./entities/User";
+import { seedUser } from "./scripts/seedUser";
 
 dotenv.config();
 
@@ -40,13 +44,17 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// Public Routes
 app.get("/", (req, res) => res.send("Finance Tracker API (TypeScript/TypeORM) is running"));
 app.get("/api/health", (req, res) => res.json({ 
   status: "ok", 
   database: AppDataSource.isInitialized ? "connected" : "connecting" 
 }));
 
+app.use("/api/auth", authRoutes);
+
+// Protected Routes
+app.use(authMiddleware as any);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/budgets", budgetRoutes);
@@ -61,6 +69,11 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 async function seedInitialData() {
   try {
+    const userRepository = AppDataSource.getRepository(User);
+    const legacyUser = await userRepository.findOneBy({ email: "sr534377@gmail.com" });
+    
+    if (!legacyUser) return;
+
     const accountRepository = AppDataSource.getRepository(Account);
     const initialAccounts = [
       { name: 'Punjab', balance: 90.00 },
@@ -70,31 +83,13 @@ async function seedInitialData() {
     ];
 
     for (const acc of initialAccounts) {
-      // Check for exact name
-      let account = await accountRepository.findOneBy({ name: acc.name });
+      let account = await accountRepository.findOneBy({ name: acc.name, user: { id: legacyUser.id } });
       
-      // If not found, check if an "old" version exists to rename it
       if (!account) {
-        const oldName = acc.name === 'Punjab' ? 'Punjab Bank' : 
-                        acc.name === 'SBI' ? 'SBI Bank' :
-                        acc.name === 'Jio' ? 'Jio Payments' :
-                        acc.name === 'Maa' ? 'Maa Savings' : null;
-        
-        if (oldName) {
-          account = await accountRepository.findOneBy({ name: oldName });
-          if (account) {
-            console.log(`🔄 Updating ${oldName} to ${acc.name}`);
-            account.name = acc.name;
-          }
-        }
+        console.log(`🌱 Creating account: ${acc.name} for User ${legacyUser.id}`);
+        account = accountRepository.create({ ...acc, user: legacyUser });
       }
 
-      if (!account) {
-        console.log(`🌱 Creating account: ${acc.name}`);
-        account = accountRepository.create(acc);
-      }
-
-      // Always ensure the balance matches your provided data for this sync
       account.balance = acc.balance;
       await accountRepository.save(account);
     }

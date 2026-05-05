@@ -1,20 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  LayoutDashboard, 
-  ArrowUpCircle, 
-  ArrowDownCircle, 
-  CreditCard, 
-  History as HistoryIcon,
-  Plus,
-  ArrowRightLeft,
-  Settings,
-  Banknote,
-  Wallet,
-  Car,
-  Fuel,
-  Utensils,
-  ShoppingBag,
-  Heart
+  LogOut,
+  User as UserIcon,
+  Wallet
 } from 'lucide-react';
 import { api, Account, Transaction, Budget } from './api';
 import Dashboard from './components/Dashboard';
@@ -24,10 +12,15 @@ import AccountManager from './components/AccountManager';
 import History from './components/History';
 import LentMoneyManager from './components/LentMoneyManager';
 import { format } from 'date-fns';
-import { ToastProvider } from './context/ToastContext';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
-
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -35,10 +28,12 @@ const App: React.FC = () => {
   const [upcomingExpenses, setUpcomingExpenses] = useState<any[]>([]);
   const [lentRecords, setLentRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user, logout } = useAuth();
 
   const currentMonth = format(new Date(), 'yyyy-MM');
 
   const fetchData = async () => {
+    if (!user) return;
     try {
       const [accRes, transRes, budgetRes, upcomingRes, lentRes] = await Promise.all([
         api.get('/accounts'),
@@ -60,8 +55,12 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard' },
@@ -72,10 +71,41 @@ const App: React.FC = () => {
     { id: 'history', label: 'All Transactions' },
   ];
 
+  if (!user) return null;
+
   return (
     <div className="max-w-5xl mx-auto min-h-screen pb-10 bg-zinc-950 text-zinc-100 font-sans transition-all duration-300">
+      {/* Top Header */}
+      <header className="px-4 py-6 flex justify-between items-center max-w-5xl mx-auto">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+            <Wallet className="w-5 h-5 text-zinc-100" />
+          </div>
+          <div>
+            <h1 className="text-lg font-black tracking-tight">Finance Tracker</h1>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Management System</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+            <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center">
+              <UserIcon className="w-3.5 h-3.5 text-zinc-400" />
+            </div>
+            <span className="text-xs font-bold text-zinc-300">{user?.name || 'User'}</span>
+          </div>
+          <button 
+            onClick={logout}
+            className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white transition-all transform active:scale-95"
+            title="Sign Out"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+
       {/* Top Tab Navigation */}
-      <div className="sticky top-0 bg-zinc-950/80 backdrop-blur-md z-[60] pt-6 px-4 md:px-0 pb-4 border-b border-zinc-900 mb-8">
+      <div className="sticky top-0 bg-zinc-950/80 backdrop-blur-md z-[60] pt-2 px-4 md:px-0 pb-4 border-b border-zinc-900 mb-8">
         <div className="flex flex-wrap items-center gap-2 max-w-5xl mx-auto">
           {tabs.map((tab) => (
             <button
@@ -151,5 +181,27 @@ const App: React.FC = () => {
     </div>
   );
 };
+
+// Main App component with routing
+const App: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route 
+        path="/*" 
+        element={
+          <ProtectedRoute>
+            <AppContent />
+          </ProtectedRoute>
+        } 
+      />
+    </Routes>
+  );
+};
+
+
 
 export default App;

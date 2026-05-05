@@ -42,6 +42,10 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
     .filter(t => t.type?.toLowerCase() === 'received_money' || t.category?.toLowerCase().includes('received from others'))
     .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
+  const sentToOthers = monthTransactions
+    .filter(t => t.category === 'Transfer for Other')
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
+
   const maaSavingsTotal = accounts.find(a => a.name.toLowerCase().includes('maa'))?.balance || 0;
   
   const budgetAmountNum = budget ? parseFloat(budget.amount) : 0;
@@ -102,6 +106,10 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
             <span className="text-sm font-medium text-rose-400">-₹{emiPaid.toLocaleString()}</span>
           </div>
           <div className="flex justify-between items-center pb-3 border-b border-zinc-800/50">
+            <span className="text-sm text-zinc-400">Sent to Others</span>
+            <span className="text-sm font-medium text-rose-400">-₹{sentToOthers.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between items-center pb-3 border-b border-zinc-800/50">
             <span className="text-sm text-zinc-400">Transferred to Maa</span>
             <span className="text-sm font-medium text-rose-400">-₹{transferredToMaa.toLocaleString()}</span>
           </div>
@@ -111,7 +119,7 @@ const Dashboard: React.FC<DashboardProps> = ({ accounts, transactions = [], budg
           </div>
           <div className="flex justify-between items-center pt-2">
             <span className="text-base font-bold text-zinc-200">Balance in hand</span>
-            <span className="text-base font-bold text-emerald-400">₹{(salaryReceived + receivedFromOthers - emiPaid - transferredToMaa - handExpenses).toLocaleString()}</span>
+            <span className="text-base font-bold text-emerald-400">₹{(salaryReceived + receivedFromOthers - emiPaid - transferredToMaa - handExpenses - sentToOthers).toLocaleString()}</span>
           </div>
         </div>
       </div>
