@@ -13,7 +13,7 @@ dotenv.config();
 export const AppDataSource = new DataSource({
     type: "postgres",
     url: process.env.DATABASE_URL,
-    synchronize: true, // Be careful with this in production
+    synchronize: false, // Disabled to prevent PK drop conflicts
     logging: false,
     entities: [Account, Transaction, Budget, UpcomingExpense, LentMoney, User],
     migrations: [],
