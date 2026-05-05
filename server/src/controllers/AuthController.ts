@@ -14,16 +14,16 @@ class AuthController {
   async login(req: Request, res: Response) {
     try {
       const result = await authService.login(req.body);
-      res.json(result);
+      res.status(200).json(result);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(401).json({ error: err.message });
     }
   }
 
   async forgotPassword(req: Request, res: Response) {
     try {
       const result = await authService.forgotPassword(req.body.email);
-      res.json(result);
+      res.status(200).json(result);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
@@ -31,9 +31,9 @@ class AuthController {
 
   async resetPassword(req: Request, res: Response) {
     try {
-      const { token, newPassword } = req.body;
-      const result = await authService.resetPassword(token, newPassword);
-      res.json(result);
+      const { token, password } = req.body;
+      const result = await authService.resetPassword(token, password);
+      res.status(200).json(result);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
