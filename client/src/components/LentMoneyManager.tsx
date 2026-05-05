@@ -240,7 +240,9 @@ const LentMoneyManager: React.FC<Props> = ({ lentRecords, accounts, onRefresh })
           ) : (
             <div className="space-y-3 overflow-y-auto max-h-[600px] pr-2 scrollbar-hide">
               {filteredRecords.map(r => (
-                <div key={r.id} className={`bg-zinc-950/50 border border-zinc-900 rounded-xl p-4 flex items-center justify-between hover:border-zinc-800 transition-all group ${r.status === 'repaid' ? 'opacity-50' : ''}`}>
+                <div key={r.id} className={`bg-zinc-950/50 border rounded-xl p-4 flex items-center justify-between hover:border-zinc-800 transition-all group ${
+                  r.status === 'repaid' ? 'border-emerald-500/50 shadow-[0_0_15px_-5px_rgba(16,185,129,0.2)]' : 'border-zinc-900'
+                }`}>
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${r.status === 'repaid' ? 'bg-emerald-500/10 text-emerald-500' : (r.type === 'lent' ? 'bg-amber-500/10 text-amber-500' : 'bg-rose-500/10 text-rose-500')}`}>
                       {r.status === 'repaid' ? <CheckCircle2 className="w-5 h-5" /> : (r.type === 'lent' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownLeft className="w-5 h-5" />)}
@@ -262,16 +264,18 @@ const LentMoneyManager: React.FC<Props> = ({ lentRecords, accounts, onRefresh })
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
-                      {r.status === 'pending' && (
-                        <button 
-                          onClick={() => setSettlingRecord(r)}
-                          className="p-1.5 bg-emerald-500/10 text-emerald-500 rounded-md hover:bg-emerald-500 hover:text-white transition-all transform active:scale-95 disabled:opacity-50"
-                          title="Settle this record"
-                          disabled={loading}
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                      <button 
+                        onClick={() => setSettlingRecord(r)}
+                        className={`p-1.5 rounded-md transition-all transform active:scale-95 disabled:opacity-50 ${
+                          r.status === 'repaid' 
+                            ? 'bg-emerald-500/20 text-emerald-500/50 border border-emerald-500/10' 
+                            : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white'
+                        }`}
+                        title={r.status === 'repaid' ? "Already settled" : "Settle this record"}
+                        disabled={loading}
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      </button>
                       <button onClick={() => setEditingRecord(r)} disabled={loading} className="p-1.5 hover:bg-zinc-800 rounded-md text-white transition-colors disabled:opacity-50">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
