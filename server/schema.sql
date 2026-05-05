@@ -37,7 +37,7 @@ INSERT INTO accounts (name, balance) VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- Create User table
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS "app_users" (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
