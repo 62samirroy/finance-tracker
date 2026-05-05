@@ -14,8 +14,7 @@ const recreateUserTable = async () => {
         await ds.initialize();
         console.log("Connected to DB.");
 
-        console.log("💥 Dropping existing 'user' table...");
-        // Use CASCADE to remove any foreign key constraints from external apps
+        console.log("💥 Dropping existing 'user' table (CASCADE)...");
         await ds.query('DROP TABLE IF EXISTS "user" CASCADE');
 
         console.log("🏗 Creating fresh 'user' table...");
@@ -32,7 +31,7 @@ const recreateUserTable = async () => {
             );
         `);
 
-        console.log("✨ User table recreated successfully!");
+        console.log("✅ User table recreated and is now EMPTY.");
         process.exit(0);
     } catch (err) {
         console.error("❌ Failed to recreate user table:", err);
