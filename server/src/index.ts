@@ -7,6 +7,8 @@ import transactionRoutes from "./routes/transactionRoutes";
 import budgetRoutes from "./routes/budgetRoutes";
 import upcomingExpenseRoutes from "./routes/upcomingExpenseRoutes";
 import lentMoneyRoutes from "./routes/lentMoneyRoutes";
+import authRoutes from "./routes/authRoutes";
+import { authMiddleware } from "./middleware/authMiddleware";
 import { Account } from "./entities/Account";
 
 dotenv.config();
@@ -40,13 +42,17 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// Public Routes
 app.get("/", (req, res) => res.send("Finance Tracker API (TypeScript/TypeORM) is running"));
 app.get("/api/health", (req, res) => res.json({ 
   status: "ok", 
   database: AppDataSource.isInitialized ? "connected" : "connecting" 
 }));
 
+app.use("/api/auth", authRoutes);
+
+// Protected Routes
+app.use(authMiddleware as any);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/budgets", budgetRoutes);
