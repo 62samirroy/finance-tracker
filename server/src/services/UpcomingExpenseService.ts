@@ -4,29 +4,24 @@ import { UpcomingExpense } from "../entities/UpcomingExpense";
 class UpcomingExpenseService {
   private repository = AppDataSource.getRepository(UpcomingExpense);
 
-  async getAll(userId: number) {
+  async getAll() {
     return await this.repository.find({
-      where: { user: { id: userId } },
       order: { expected_date: "ASC" }
     });
   }
 
-  async create(data: any, userId: number) {
-    const expense = this.repository.create({ ...data, user: { id: userId } });
+  async create(data: any) {
+    const expense = this.repository.create(data);
     return await this.repository.save(expense);
   }
 
-  async update(id: number, data: any, userId: number) {
-    const expense = await this.repository.findOneBy({ id, user: { id: userId } });
-    if (!expense) throw new Error("Upcoming expense not found");
-    Object.assign(expense, data);
-    return await this.repository.save(expense);
+  async update(id: number, data: any) {
+    await this.repository.update(id, data);
+    return await this.repository.findOneBy({ id });
   }
 
-  async delete(id: number, userId: number) {
-    const expense = await this.repository.findOneBy({ id, user: { id: userId } });
-    if (!expense) throw new Error("Upcoming expense not found");
-    return await this.repository.remove(expense);
+  async delete(id: number) {
+    return await this.repository.delete(id);
   }
 }
 

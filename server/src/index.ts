@@ -11,7 +11,6 @@ import authRoutes from "./routes/authRoutes";
 import { authMiddleware } from "./middleware/authMiddleware";
 import { Account } from "./entities/Account";
 import { User } from "./entities/User";
-import { seedUser } from "./scripts/seedUser";
 
 dotenv.config();
 
@@ -69,11 +68,6 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 async function seedInitialData() {
   try {
-    const userRepository = AppDataSource.getRepository(User);
-    const legacyUser = await userRepository.findOneBy({ email: "sr534377@gmail.com" });
-    
-    if (!legacyUser) return;
-
     const accountRepository = AppDataSource.getRepository(Account);
     const initialAccounts = [
       { name: 'Punjab', balance: 90.00 },
@@ -83,13 +77,31 @@ async function seedInitialData() {
     ];
 
     for (const acc of initialAccounts) {
-      let account = await accountRepository.findOneBy({ name: acc.name, user: { id: legacyUser.id } });
+      // Check for exact name
+      let account = await accountRepository.findOneBy({ name: acc.name });
       
+      // If not found, check if an "old" version exists to rename it
       if (!account) {
-        console.log(`🌱 Creating account: ${acc.name} for User ${legacyUser.id}`);
-        account = accountRepository.create({ ...acc, user: legacyUser });
+        const oldName = acc.name === 'Punjab' ? 'Punjab Bank' : 
+                        acc.name === 'SBI' ? 'SBI Bank' :
+                        acc.name === 'Jio' ? 'Jio Payments' :
+                        acc.name === 'Maa' ? 'Maa Savings' : null;
+        
+        if (oldName) {
+          account = await accountRepository.findOneBy({ name: oldName });
+          if (account) {
+            console.log(`🔄 Updating ${oldName} to ${acc.name}`);
+            account.name = acc.name;
+          }
+        }
       }
 
+      if (!account) {
+        console.log(`🌱 Creating account: ${acc.name}`);
+        account = accountRepository.create(acc);
+      }
+
+      // Always ensure the balance matches your provided data for this sync
       account.balance = acc.balance;
       await accountRepository.save(account);
     }
@@ -106,7 +118,6 @@ AppDataSource.initialize()
         console.log("✅ Data Source has been initialized!");
         
         try {
-          await seedUser();
           await seedInitialData();
         } catch (seedErr) {
           console.error("❌ Seeding process failed:", seedErr);

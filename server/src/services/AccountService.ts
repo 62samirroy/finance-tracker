@@ -4,25 +4,17 @@ import { Account } from "../entities/Account";
 class AccountService {
   private accountRepository = AppDataSource.getRepository(Account);
 
-  async getAllAccounts(userId: number) {
-    return await this.accountRepository.find({ 
-      where: { user: { id: userId } },
-      order: { id: "ASC" } 
-    });
+  async getAllAccounts() {
+    return await this.accountRepository.find({ order: { id: "ASC" } });
   }
 
-  async getAccountById(id: number, userId: number) {
-    return await this.accountRepository.findOneBy({ 
-      id, 
-      user: { id: userId } 
-    });
+  async getAccountById(id: number) {
+    return await this.accountRepository.findOneBy({ id });
   }
 
-  async updateBalance(id: number, balance: number, userId: number) {
-    const account = await this.getAccountById(id, userId);
-    if (!account) throw new Error("Account not found");
-    account.balance = balance;
-    return await this.accountRepository.save(account);
+  async updateBalance(id: number, balance: number) {
+    await this.accountRepository.update(id, { balance });
+    return await this.getAccountById(id);
   }
 
   async adjustBalance(id: number | undefined | null, amount: number, manager?: any) {

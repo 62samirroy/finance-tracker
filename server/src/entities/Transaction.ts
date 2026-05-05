@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { Account } from "./Account";
-import { User } from "./User";
 
 @Entity("transactions")
 export class Transaction {
@@ -35,7 +34,4 @@ export class Transaction {
   @ManyToOne(() => Account, (account) => account.destinationTransactions)
   @JoinColumn({ name: "destination_account_id" })
   destinationAccount?: Account;
-
-  @ManyToOne(() => User)
-  user!: User;
 }

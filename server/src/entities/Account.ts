@@ -1,21 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Transaction } from "./Transaction";
 import { Budget } from "./Budget";
-import { User } from "./User";
 
 @Entity("accounts")
 export class Account {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ unique: true })
   name!: string;
 
   @Column({ type: "decimal", precision: 15, scale: 2, default: 0 })
   balance!: number;
-
-  @ManyToOne(() => User)
-  user!: User;
 
   @OneToMany(() => Transaction, (transaction) => transaction.sourceAccount)
   sourceTransactions!: Transaction[];
