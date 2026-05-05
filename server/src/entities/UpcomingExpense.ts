@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from "typeorm";
-import { User } from "./User";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
 
 @Entity("upcoming_expenses")
 export class UpcomingExpense {
@@ -20,7 +19,4 @@ export class UpcomingExpense {
 
   @CreateDateColumn()
   created_at!: Date;
-
-  @ManyToOne(() => User)
-  user!: User;
 }

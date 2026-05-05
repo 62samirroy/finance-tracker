@@ -6,8 +6,8 @@ import { Like } from "typeorm";
 class TransactionService {
   private transactionRepository = AppDataSource.getRepository(Transaction);
 
-  async getTransactions({ type, month, userId }: { type?: string; month?: string; userId: number }) {
-    const where: any = { user: { id: userId } };
+  async getTransactions({ type, month }: { type?: string; month?: string }) {
+    const where: any = {};
     if (type && type !== 'all') {
       where.type = type;
     }
@@ -22,7 +22,7 @@ class TransactionService {
     });
   }
 
-  async createTransaction(data: any, userId: number) {
+  async createTransaction(data: any) {
     const { amount, type, category, source_account_id, destination_account_id, note, date } = data;
     
     const queryRunner = AppDataSource.createQueryRunner();
@@ -37,8 +37,7 @@ class TransactionService {
         source_account_id: source_account_id ? Number(source_account_id) : undefined,
         destination_account_id: destination_account_id ? Number(destination_account_id) : undefined,
         note,
-        date: date ? new Date(date) : new Date(),
-        user: { id: userId }
+        date: date ? new Date(date) : new Date()
       } as Partial<Transaction>);
 
       const savedTransaction = await queryRunner.manager.save(transaction);
@@ -54,7 +53,7 @@ class TransactionService {
     }
   }
 
-  async updateTransaction(id: number, data: any, userId: number) {
+  async updateTransaction(id: number, data: any) {
     const { amount, type, category, source_account_id, destination_account_id, note, date } = data;
 
     const queryRunner = AppDataSource.createQueryRunner();
@@ -62,9 +61,7 @@ class TransactionService {
     await queryRunner.startTransaction();
 
     try {
-      const old = await queryRunner.manager.findOne(Transaction, { 
-        where: { id, user: { id: userId } } 
-      });
+      const old = await queryRunner.manager.findOneBy(Transaction, { id });
       if (!old) throw new Error('Transaction not found');
 
       await this.reverseBalanceEffect(old, queryRunner.manager);
@@ -90,15 +87,13 @@ class TransactionService {
     }
   }
 
-  async deleteTransaction(id: number, userId: number) {
+  async deleteTransaction(id: number) {
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const old = await queryRunner.manager.findOne(Transaction, { 
-        where: { id, user: { id: userId } } 
-      });
+      const old = await queryRunner.manager.findOneBy(Transaction, { id });
       if (!old) throw new Error('Transaction not found');
 
       await this.reverseBalanceEffect(old, queryRunner.manager);

@@ -1,13 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import { Account } from "./Account";
-import { User } from "./User";
 
 @Entity("budgets")
 export class Budget {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ unique: true })
   month!: string;
 
   @Column({ type: "decimal", precision: 15, scale: 2 })
@@ -19,7 +18,4 @@ export class Budget {
   @ManyToOne(() => Account, (account) => account.budgets)
   @JoinColumn({ name: "withdrawn_from_account_id" })
   withdrawnFromAccount?: Account;
-
-  @ManyToOne(() => User)
-  user!: User;
 }
