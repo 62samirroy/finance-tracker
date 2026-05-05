@@ -4,24 +4,29 @@ import { LentMoney } from "../entities/LentMoney";
 class LentMoneyService {
   private repository = AppDataSource.getRepository(LentMoney);
 
-  async getAll() {
+  async getAll(userId: number) {
     return await this.repository.find({
+      where: { user: { id: userId } },
       order: { date: "DESC" }
     });
   }
 
-  async create(data: any) {
-    const record = this.repository.create(data);
+  async create(data: any, userId: number) {
+    const record = this.repository.create({ ...data, user: { id: userId } });
     return await this.repository.save(record);
   }
 
-  async update(id: number, data: any) {
-    await this.repository.update(id, data);
-    return await this.repository.findOneBy({ id });
+  async update(id: number, data: any, userId: number) {
+    const record = await this.repository.findOneBy({ id, user: { id: userId } });
+    if (!record) throw new Error("Lent money record not found");
+    Object.assign(record, data);
+    return await this.repository.save(record);
   }
 
-  async delete(id: number) {
-    return await this.repository.delete(id);
+  async delete(id: number, userId: number) {
+    const record = await this.repository.findOneBy({ id, user: { id: userId } });
+    if (!record) throw new Error("Lent money record not found");
+    return await this.repository.remove(record);
   }
 }
 

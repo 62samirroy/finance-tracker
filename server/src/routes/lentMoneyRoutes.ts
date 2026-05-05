@@ -1,38 +1,39 @@
-import { Router } from "express";
+import { Router, Response } from "express";
 import service from "../services/LentMoneyService";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/", async (req: AuthRequest, res: Response) => {
   try {
-    const data = await service.getAll();
+    const data = await service.getAll(req.user.id);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch lent money records" });
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req: AuthRequest, res: Response) => {
   try {
-    const data = await service.create(req.body);
+    const data = await service.create(req.body, req.user.id);
     res.status(201).json(data);
   } catch (err) {
     res.status(500).json({ error: "Failed to create lent money record" });
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req: AuthRequest, res: Response) => {
   try {
-    const data = await service.update(Number(req.params.id), req.body);
+    const data = await service.update(Number(req.params.id), req.body, req.user.id);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: "Failed to update lent money record" });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: AuthRequest, res: Response) => {
   try {
-    await service.delete(Number(req.params.id));
+    await service.delete(Number(req.params.id), req.user.id);
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: "Failed to delete lent money record" });
