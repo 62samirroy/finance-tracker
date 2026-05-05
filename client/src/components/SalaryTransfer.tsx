@@ -74,7 +74,7 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
     { id: 'emi', label: 'EMI', icon: '📋' },
   ];
 
-  
+
   return (
     <div className="space-y-8">
       {/* Sub Navigation */}
