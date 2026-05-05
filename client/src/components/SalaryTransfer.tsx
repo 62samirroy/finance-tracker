@@ -70,6 +70,7 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
     { id: 'received_money', label: 'Received money', icon: '📥' },
     { id: 'self_transfer', label: 'Self Transfer', icon: '🔄' },
     { id: 'transfer_maa', label: 'To Maa', icon: '👩' },
+    { id: 'transfer_other', label: 'Transfer for Other', icon: '💸' },
     { id: 'emi', label: 'EMI', icon: '📋' },
   ];
 
@@ -353,6 +354,62 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
             </div>
           )}
 
+          {activeSubTab === 'transfer_other' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="p-2 bg-zinc-500/10 rounded-lg">
+                  <span className="text-zinc-500 text-lg">💸</span>
+                </div>
+                <h3 className="text-sm font-semibold text-zinc-200">Transfer for Others</h3>
+              </div>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                handleSubmit('transfer', {
+                  amount: formData.get('amount'),
+                  source_account_id: formData.get('from'),
+                  note: formData.get('note'),
+                  category: 'Transfer for Other',
+                  date: formData.get('date') ? new Date(formData.get('date') as string) : new Date()
+                });
+                e.currentTarget.reset();
+              }} className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Amount</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₹</span>
+                      <input name="amount" type="number" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 transition-colors" required />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Date</label>
+                    <input name="date" type="date" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 transition-colors" defaultValue={format(new Date(), 'yyyy-MM-dd')} required />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">From bank</label>
+                  <select name="from" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 appearance-none" required>
+                    {accounts
+                      .filter(a => a.name && !a.name.toLowerCase().includes('maa'))
+                      .map(acc => (
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name.toLowerCase().includes('bank') ? acc.name : `${acc.name} Bank`}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Note (Who & Why?)</label>
+                  <input name="note" placeholder="e.g. Sent to Friend for lunch" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-zinc-600 transition-colors" />
+                </div>
+                <button type="submit" disabled={loading} className="w-full bg-zinc-800 border border-zinc-700 py-3 rounded-xl text-sm font-bold text-zinc-200 hover:bg-zinc-700 hover:text-white transition-all transform active:scale-[0.98] shadow-lg">
+                  Record Transfer ↗
+                </button>
+              </form>
+            </div>
+          )}
+
           {activeSubTab === 'emi' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="flex items-center gap-2 mb-6">
@@ -442,7 +499,7 @@ const SalaryTransfer: React.FC<Props> = ({ accounts, transactions, onRefresh }) 
                     <p className="text-[10px] text-zinc-500 font-medium">
                       {format(new Date(t.date), 'dd MMM yyyy')} • {
                         t.type === 'salary' || t.type === 'received_money' ? `Credited to ${t.destinationAccount?.name}` :
-                        t.type === 'transfer' || t.type === 'self_transfer' ? `${t.sourceAccount?.name} ➔ ${t.destinationAccount?.name}` :
+                        t.type === 'transfer' || t.type === 'self_transfer' ? `${t.sourceAccount?.name} ➔ ${t.destinationAccount?.name || 'External'}` :
                         t.sourceAccount?.name || t.destinationAccount?.name
                       }
                     </p>
