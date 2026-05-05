@@ -99,27 +99,28 @@ async function seedInitialData() {
   }
 }
 
-// Start server immediately to satisfy health checks
-app.listen(PORT, () => {
-    console.log(`🚀 Server listening on port ${PORT}`);
-    
-    // Initialize DB in the background
-    console.log("📡 Initializing database connection...");
-    AppDataSource.initialize()
-        .then(async () => {
-            console.log("✅ Data Source has been initialized!");
-            try {
-              await seedUser();
-              await seedInitialData();
-            } catch (seedErr) {
-              console.error("❌ Seeding process failed:", seedErr);
-            }
-        })
-        .catch((err) => {
-            console.error("❌ Error during Data Source initialization:", err);
-            // In production, we might want to exit if DB fails
-            if (process.env.NODE_ENV === 'production') {
-              console.error("💀 Critical Failure: Database unreachable. Server may not function correctly.");
-            }
+// Initialize Database then Start Server
+console.log("📡 Initializing database connection...");
+AppDataSource.initialize()
+    .then(async () => {
+        console.log("✅ Data Source has been initialized!");
+        
+        try {
+          await seedUser();
+          await seedInitialData();
+        } catch (seedErr) {
+          console.error("❌ Seeding process failed:", seedErr);
+        }
+
+        app.listen(PORT, () => {
+            console.log(`🚀 Server listening on port ${PORT}`);
         });
-});
+    })
+    .catch((err) => {
+        console.error("❌ Error during Data Source initialization:", err);
+        // In production, we must fail fast if the DB is unreachable
+        if (process.env.NODE_ENV === 'production') {
+          console.error("💀 Critical Failure: Database unreachable. Exiting...");
+          process.exit(1);
+        }
+    });
