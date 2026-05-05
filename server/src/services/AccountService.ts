@@ -2,24 +2,26 @@ import { AppDataSource } from "../data-source";
 import { Account } from "../entities/Account";
 
 class AccountService {
-  private accountRepository = AppDataSource.getRepository(Account);
+  private get repo() {
+    return AppDataSource.getRepository(Account);
+  }
 
   async getAllAccounts() {
-    return await this.accountRepository.find({ order: { id: "ASC" } });
+    return await this.repo.find({ order: { id: "ASC" } });
   }
 
   async getAccountById(id: number) {
-    return await this.accountRepository.findOneBy({ id });
+    return await this.repo.findOneBy({ id });
   }
 
   async updateBalance(id: number, balance: number) {
-    await this.accountRepository.update(id, { balance });
+    await this.repo.update(id, { balance });
     return await this.getAccountById(id);
   }
 
   async adjustBalance(id: number | undefined | null, amount: number, manager?: any) {
     if (!id) return;
-    const repo = manager ? manager.getRepository(Account) : this.accountRepository;
+    const repo = manager ? manager.getRepository(Account) : this.repo;
     const account = await repo.findOneBy({ id });
     if (account) {
       account.balance = Number(account.balance) + amount;

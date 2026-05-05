@@ -2,10 +2,12 @@ import { AppDataSource } from "../data-source";
 import { Budget } from "../entities/Budget";
 
 class BudgetService {
-  private budgetRepository = AppDataSource.getRepository(Budget);
+  private get repo() {
+    return AppDataSource.getRepository(Budget);
+  }
 
   async getBudgetByMonth(month: string) {
-    return await this.budgetRepository.findOneBy({ month });
+    return await this.repo.findOneBy({ month });
   }
 
   async setBudget(data: { month: string; amount: number; withdrawn_from_account_id?: number }) {
@@ -16,14 +18,14 @@ class BudgetService {
       budget.amount = amount;
       budget.withdrawn_from_account_id = withdrawn_from_account_id;
     } else {
-      budget = this.budgetRepository.create({
+      budget = this.repo.create({
         month,
         amount,
         withdrawn_from_account_id
       });
     }
 
-    return await this.budgetRepository.save(budget);
+    return await this.repo.save(budget);
   }
 }
 

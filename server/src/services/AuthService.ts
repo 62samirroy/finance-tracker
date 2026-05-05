@@ -5,24 +5,26 @@ import jwt from "jsonwebtoken";
 import emailService from "./EmailService";
 
 class AuthService {
-  private userRepository = AppDataSource.getRepository(User);
+  private get repo() {
+    return AppDataSource.getRepository(User);
+  }
 
   async register(data: any) {
     const { email, password, name } = data;
     
-    const existingUser = await this.userRepository.findOneBy({ email });
+    const existingUser = await this.repo.findOneBy({ email });
     if (existingUser) {
       throw new Error("User already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = this.userRepository.create({
+    const user = this.repo.create({
       email,
       password: hashedPassword,
       name
     });
 
-    await this.userRepository.save(user);
+    await this.repo.save(user);
     
     return this.generateToken(user);
   }
@@ -30,7 +32,7 @@ class AuthService {
   async login(data: any) {
     const { email, password } = data;
     
-    const user = await this.userRepository.findOneBy({ email });
+    const user = await this.repo.findOneBy({ email });
     if (!user) {
       throw new Error("Invalid credentials");
     }
@@ -58,7 +60,7 @@ class AuthService {
   }
 
   async forgotPassword(email: string) {
-    const user = await this.userRepository.findOneBy({ email });
+    const user = await this.repo.findOneBy({ email });
     if (!user) {
       throw new Error("User not found");
     }
@@ -66,7 +68,7 @@ class AuthService {
     const resetToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "secret", { expiresIn: '1h' });
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
-    await this.userRepository.save(user);
+    await this.repo.save(user);
 
     await emailService.sendResetPasswordEmail(user.email, resetToken);
 
@@ -74,7 +76,7 @@ class AuthService {
   }
 
   async resetPassword(token: string, newPassword: any) {
-    const user = await this.userRepository.findOne({
+    const user = await this.repo.findOne({
       where: {
         resetPasswordToken: token,
       }
@@ -87,7 +89,7 @@ class AuthService {
     user.password = await bcrypt.hash(newPassword, 10);
     user.resetPasswordToken = "";
     user.resetPasswordExpires = new Date(0);
-    await this.userRepository.save(user);
+    await this.repo.save(user);
 
     return { message: "Password has been reset" };
   }

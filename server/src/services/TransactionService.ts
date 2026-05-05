@@ -4,7 +4,9 @@ import accountService from "./AccountService";
 import { Like } from "typeorm";
 
 class TransactionService {
-  private transactionRepository = AppDataSource.getRepository(Transaction);
+  private get repo() {
+    return AppDataSource.getRepository(Transaction);
+  }
 
   async getTransactions({ type, month }: { type?: string; month?: string }) {
     const where: any = {};
@@ -15,7 +17,7 @@ class TransactionService {
       where.date = Like(`${month}%`);
     }
 
-    return await this.transactionRepository.find({
+    return await this.repo.find({
       where,
       order: { date: "DESC", id: "DESC" },
       relations: ["sourceAccount", "destinationAccount"]
@@ -30,7 +32,7 @@ class TransactionService {
     await queryRunner.startTransaction();
 
     try {
-      const transaction = this.transactionRepository.create({
+      const transaction = this.repo.create({
         amount,
         type,
         category,
