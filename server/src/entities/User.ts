@@ -13,16 +13,4 @@ export class User {
 
   @Column({ nullable: true })
   name!: string;
-
-  @Column({ nullable: true })
-  resetPasswordToken!: string;
-
-  @Column({ type: "timestamp", nullable: true })
-  resetPasswordExpires!: Date;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }
