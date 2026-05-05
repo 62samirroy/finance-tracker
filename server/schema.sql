@@ -35,3 +35,15 @@ INSERT INTO accounts (name, balance) VALUES
 ('Jio', 0.00),
 ('Maa Account', 0.00)
 ON CONFLICT (name) DO NOTHING;
+
+-- Create User table
+CREATE TABLE IF NOT EXISTS "user" (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    reset_password_token VARCHAR(255),
+    reset_password_expires TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
