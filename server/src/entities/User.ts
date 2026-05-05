@@ -14,15 +14,15 @@ export class User {
   @Column({ nullable: true })
   name!: string;
 
-  @Column({ nullable: true })
+  @Column({ name: "reset_password_token", nullable: true })
   resetPasswordToken!: string;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ name: "reset_password_expires", type: "timestamp", nullable: true })
   resetPasswordExpires!: Date;
 
-  @CreateDateColumn({ type: "timestamp" })
+  @CreateDateColumn({ name: "created_at", type: "timestamp" })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: "timestamp" })
+  @UpdateDateColumn({ name: "updated_at", type: "timestamp" })
   updatedAt!: Date;
 }
